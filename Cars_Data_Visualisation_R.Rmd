@@ -1,0 +1,110 @@
+---
+title: "Untitled"
+author: "Dara Abb"
+date: "2025-04-10"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+Import datasets
+
+
+```{r}
+cars <- read.csv("cars.csv")
+
+retail_clean <- read.csv("retail_clean.csv")
+```
+
+Scatterplots:are used to examine the relationship between two continuous variables
+
+1st Scatterplot: examines the relation between horsepower an city miler per gallon 
+
+```{r}
+cars %>% ggplot(aes(x= horsepower, y=city_miles_per_galloon, color=Price))+geom_point()
+```
+```{r}
+
+```
+
+
+2nd Scatterplot: Weight vs. Price with Size and Color Modifications
+
+
+```{r}
+cars %>% ggplot(aes(x=weight, y= Price, color=sports_car, size=horsepower))+geom_point()
+
+```
+
+3rd Scatterplot: Scatterplot with Different Shape
+
+```{r}
+cars %>% ggplot(aes(x=weight, y= Price, shape=sports_car))+geom_point()+theme_classic()
+
+```
+
+4th Scatterplot: Price vs. Horsepower with Cylinders Factor
+
+```{r}
+cars %>% ggplot(aes(x=Price, y= horsepower, color=factor(cylenders)))+geom_point()
+```
+
+Bar plots help to visualize categorical data by representing the frequency of each category.
+
+Top 9 Countries with Highest Appearances
+
+```{r}
+top9_international <- retail_clean %>% group_by(Country) %>% summarise(appearnece = n()) %>% arrange(desc(appearnece))%>% 
+  slice(2:10) 
+
+top9 <- as.vector(top9_international[["Country"]])
+
+retail_clean %>% filter(Country %in% top9) %>% ggplot(aes(x= Country))+geom_bar(fill= "darkred")
+```
+
+Weekday Distribution Plot
+
+```{r}
+retail_clean<- retail_clean %>% separate(col = InvoiceDate,
+                                         into = c("date","time"),
+                                         sep = " ")
+
+head(retail_clean)
+
+#####weekday analysis
+retail_clean$date <- as.Date(retail_clean$date)
+
+retail_clean$week <- weekdays(retail_clean$date)
+
+retail_clean %>% ggplot(aes(x=week))+geom_bar()
+```
+
+Bar Plot for Top 9 Countries Reordered
+
+```{r}
+top9_international %>% 
+  ggplot(aes(x=reorder(Country, appearnece), y=appearnece))+geom_col()+coord_flip()+xlab("Top 9 International")
+
+```
+
+Density Plot: Horsepower by Cylinders
+
+```{r}
+cars %>% ggplot(aes(x=horsepower, fill = factor(cylenders)))+ geom_density(alpha=0.3)
+
+```
+
+Box plots: Box plots are used to visualize the distribution of a continuous variable and identify outliers.
+
+```{r}
+##Box Plot: Horsepower by Cylinders
+table(cars$cylenders)
+cars %>% filter(cylenders %in% c(4,6,8)) %>% ggplot(aes(x=factor(cylenders), y=horsepower))+geom_boxplot()
+
+```
+
